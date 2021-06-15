@@ -93,6 +93,13 @@ public class GameManager {
         return game.getWinner();
     }
 
+    public boolean isDraw(final String sessionId){
+        Game game = userSessionEntityMap.get(sessionId).getGame();
+        if(game == null)
+            return false;
+        return game.isDraw();
+    }
+
     public List<String> getAllSessionIdAssociated(final String sessionId){
         Game game = userSessionEntityMap.get(sessionId).getGame();
         List<String> sessionIds = new ArrayList<>();

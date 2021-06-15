@@ -73,8 +73,8 @@ public class WebSocketController {
                 // this means that move has been successfully placed
                 String winnerSessionId = gameManager.isWinAchieved(session.getId());
 
+                List<String> sessionIds = gameManager.getAllSessionIdAssociated(session.getId());
                 if(winnerSessionId != null && !winnerSessionId.isEmpty()){
-                    List<String> sessionIds = gameManager.getAllSessionIdAssociated(session.getId());
                     String opponentSessionId = sessionIds.stream().filter(id -> id != session.getId()).collect(Collectors.toList()).get(0);
                     Session opponentWebSocketSession = gameManager.getSession(opponentSessionId);
 
@@ -93,13 +93,29 @@ public class WebSocketController {
                     opponentWebSocketSession.getAsyncRemote().sendText(SerializeDeserializeUtil.getResponse(opponentResponseDto));
 
                     return;
+                } else if(gameManager.isDraw(session.getId())){
+                    String opponentSessionId = sessionIds.stream().filter(id -> id != session.getId()).collect(Collectors.toList()).get(0);
+                    Session opponentWebSocketSession = gameManager.getSession(opponentSessionId);
+                    char symbol = gameManager.getPlayerSymbolFromSessionId(session.getId());
+
+                    ResponseDto responseDto = new ResponseDto("draw");
+                    responseDto.setWinningMessage("Match Draw!!");
+                    responseDto.setSymbol(symbol);
+                    responseDto.setBoardIndex(requestDto.getIndex());
+                    session.getAsyncRemote().sendText(SerializeDeserializeUtil.getResponse(responseDto));
+
+                    ResponseDto opponentResponseDto = new ResponseDto("draw");
+                    opponentResponseDto.setWinningMessage("Match Draw!!");
+                    opponentResponseDto.setSymbol(symbol);
+                    opponentResponseDto.setBoardIndex(requestDto.getIndex());
+                    opponentWebSocketSession.getAsyncRemote().sendText(SerializeDeserializeUtil.getResponse(opponentResponseDto));
+
                 }
                 ResponseDto responseDto = new ResponseDto(requestDto.getMessage());
                 responseDto.setSymbol(gameManager.getPlayerSymbolFromSessionId(session.getId()));
                 responseDto.setBoardIndex(requestDto.getIndex());
                 String response = SerializeDeserializeUtil.getResponse(responseDto);
 
-                List<String> sessionIds = gameManager.getAllSessionIdAssociated(session.getId());
                 Session webSocketSession = gameManager.getSession(sessionIds.get(0));
                 Session opponentWebSocketSession = gameManager.getSession(sessionIds.get(1));
 

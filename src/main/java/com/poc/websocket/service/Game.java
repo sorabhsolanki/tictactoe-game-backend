@@ -54,6 +54,10 @@ public class Game {
         return winner;
     }
 
+    public boolean isDraw(){
+        return board.isDraw();
+    }
+
     public char getSymbol(final String sessionId){
         return symbolMap.get(sessionId).second;
     }

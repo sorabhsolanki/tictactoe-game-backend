@@ -8,6 +8,8 @@ public class Board {
     private int diagonal = 0;
     private int revDiagonal = 0;
 
+    private int moveCount = 0;
+
     public Board(){
         mat = new int[3][3];
         rows = new int[3];
@@ -18,6 +20,8 @@ public class Board {
         if(!isSafe(row, col)){
             return false;
         }
+
+        moveCount ++;
 
         int n = mat.length;
         mat[row][col] = symbol;
@@ -37,9 +41,14 @@ public class Board {
 
         return false;
     }
+
     private boolean isSafe(int row, int col){
         if(row < 0 || row >= mat.length || col < 0 || col >= mat[0].length || mat[row][col] != 0)
             return false;
         return true;
+    }
+
+    public boolean isDraw(){
+        return moveCount == 9 ? true : false;
     }
 }

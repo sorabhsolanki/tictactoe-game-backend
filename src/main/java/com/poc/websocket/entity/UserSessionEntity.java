@@ -1,5 +1,6 @@
 package com.poc.websocket.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.poc.websocket.service.Game;
 
 import javax.websocket.Session;
@@ -7,6 +8,7 @@ import javax.websocket.Session;
 public class UserSessionEntity {
 
     private final String userName;
+    @JsonIgnore
     private final Session websocketSession;
     private final Game game;
 

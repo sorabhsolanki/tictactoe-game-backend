@@ -5,7 +5,8 @@ import com.poc.websocket.dto.RequestDto;
 import com.poc.websocket.dto.ResponseDto;
 import com.poc.websocket.handler.GameManager;
 import com.poc.websocket.util.SerializeDeserializeUtil;
-import org.apache.log4j.Logger;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.websocket.*;
 import javax.websocket.server.ServerEndpoint;
@@ -15,7 +16,7 @@ import java.util.stream.Collectors;
 @ServerEndpoint("/tictactoeserver")
 public class WebSocketController {
 
-    private final static Logger LOG = Logger.getLogger(WebSocketController.class);
+    private final static Logger LOG = LoggerFactory.getLogger(WebSocketController.class);
     private static final GameManager gameManager = GameManager.getInstance();
 
     public WebSocketController() {
@@ -28,7 +29,7 @@ public class WebSocketController {
 
     @OnMessage
     public void onMessage(String data, Session session) {
-        LOG.info(String.format("Data from session %s is %s ", session.getId(), data));
+        LOG.info("Data from session {} is {} ", session.getId(), data);
         RequestDto requestDto = SerializeDeserializeUtil.getMessage(data);
         if (requestDto.getMessage().equals("loggingin")) {
             boolean isEntered = gameManager.enterRoom(requestDto.getRoomNo(), session, requestDto.getUserName());
@@ -127,12 +128,12 @@ public class WebSocketController {
 
     @OnClose
     public void onClose(CloseReason reason, Session session) {
-        LOG.info(String.format("Closing a WebSocket session %s due to %s ", session.getId(), reason.getReasonPhrase()));
+        LOG.info("Closing a WebSocket session {} due to {} ", session.getId(), reason.getReasonPhrase());
     }
 
     @OnError
     public void onError(Session session, Throwable t) {
-        LOG.info(String.format("Got error message from session %s and ,message %s", session.getId(), t.getMessage()));
+        LOG.info("Got error message from session {} and ,message {}", session.getId(), t.getMessage());
     }
 
 }

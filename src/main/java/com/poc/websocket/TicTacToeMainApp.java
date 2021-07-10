@@ -1,47 +1,33 @@
 package com.poc.websocket;
 
+import com.poc.websocket.controller.AdminController;
 import com.poc.websocket.controller.WebSocketController;
+import com.poc.websocket.util.PropertyReader;
+import io.dropwizard.Application;
+import io.dropwizard.setup.Bootstrap;
+import io.dropwizard.setup.Environment;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.server.ServerConnector;
 import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.websocket.jsr356.server.deploy.WebSocketServerContainerInitializer;
 
-public class TicTacToeMainApp {
+public class TicTacToeMainApp extends Application<TicTacToeServiceConfiguration> {
 
-    private void startServer() throws Exception {
-        // Expose Prometheus metrics.
-        Server server = new Server();
-        ServerConnector connector = new ServerConnector(server);
-        connector.setPort(8002);
-        server.addConnector(connector);
+    @Override
+    public void initialize(final Bootstrap<TicTacToeServiceConfiguration> bootstrap) {
+    }
 
-        // Setup the basic application "context" for this application at "/"
-        ServletContextHandler context = new ServletContextHandler(ServletContextHandler.SESSIONS);
-        context.setContextPath("/");
-        server.setHandler(context);
-        try {
-            // Initialize javax.websocket layer
-            WebSocketServerContainerInitializer.configure(context,
-                    (servletContext, wsContainer) ->
-                    {
-                        // This lambda will be called at the appropriate place in the
-                        // ServletContext initialization phase where you can initialize
-                        // and configure  your websocket container.
-                        // Configure defaults for container
-                        wsContainer.setDefaultMaxTextMessageBufferSize(65535);
-                        // Add WebSocket endpoint to javax.websocket layer
-                        wsContainer.addEndpoint(WebSocketController.class);
-                    });
-
-            server.start();
-            server.join();
-        } catch (Throwable t) {
-            t.printStackTrace(System.err);
-        }
+    @Override
+    public void run(TicTacToeServiceConfiguration ticTacToeServiceConfiguration, Environment environment) {
+        PropertyReader.init();
+        environment.jersey().register(new AdminController());
+        WebSocketServerContainerInitializer.configure(environment.getApplicationContext(), (servletContext, serverContainer) -> {
+            serverContainer.setDefaultMaxTextMessageBufferSize(200);
+            serverContainer.addEndpoint(WebSocketController.class);
+        });
     }
 
     public static void main(String[] args) throws Exception {
-        TicTacToeMainApp ticTacToeMainApp = new TicTacToeMainApp();
-        ticTacToeMainApp.startServer();
+        new TicTacToeMainApp().run(args);
     }
 }

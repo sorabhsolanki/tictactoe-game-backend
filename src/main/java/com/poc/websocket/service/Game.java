@@ -79,4 +79,12 @@ public class Game {
             this.second = second;
         }
     }
+
+    public String getGameId() {
+        return gameId;
+    }
+
+    public int getCurrentMove() {
+        return currentMove;
+    }
 }
